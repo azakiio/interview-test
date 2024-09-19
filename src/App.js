@@ -1,5 +1,5 @@
-import styled from 'styled-components';
-import { MembersList } from './components';
+import styled from "styled-components";
+import MembersList from "./components/member-list";
 
 export const Root = styled.main`
   height: 100vh;

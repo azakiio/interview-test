@@ -1,8 +1,8 @@
 body {
   margin: 0;
   font-size: 1rem;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
+    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -14,8 +14,16 @@ table tbody {
   overflow-y: scroll;
 }
 
-table thead, table tbody tr {
+table thead,
+table tbody tr {
   display: table;
   width: 100%;
   table-layout: fixed;
+}
+
+.btn {
+  padding: 0.5rem 1rem;
+  border-radius: 1rem;
+  background-color: #4dabf7;
+  color: white;
 }

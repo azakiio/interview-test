@@ -39,7 +39,7 @@ app.get('/members', (req, res) => {
  * @body rating: enum [1-5]
  */
 app.post("/members", (req, res) => {
-  const body = req.body.body;
+  const body = req.body;
   let newMember = body;
   if (body) {
     if (!body.name) {
@@ -47,9 +47,9 @@ app.post("/members", (req, res) => {
       return;
     }
     newMember = {
-      id: randomNumber,
       activities: [],
       ...body,
+      id: randomNumber,
     };
     members.push(newMember);
   }
@@ -67,7 +67,7 @@ app.post("/members", (req, res) => {
 app.patch('/members/:id', (req, res) => {
   console.log('PATCH /members');
   const id = req.params.id;
-  const body = req.body.body;
+  const body = req.body;
 
   if (body) {
     members = members.map(member => {
