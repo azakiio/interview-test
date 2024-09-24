@@ -5,6 +5,7 @@ import { useEffect, useRef } from "react";
 function Modal({ openModal, closeModal, children, Title }) {
   const ref = useRef();
 
+  // TODO: close on click outside
   useEffect(() => {
     if (openModal) {
       ref.current?.showModal();
@@ -20,7 +21,7 @@ function Modal({ openModal, closeModal, children, Title }) {
           {Title}
           <button
             onClick={closeModal}
-            className="p-2 rounded-full bg-red text-white w-fit ml-auto"
+            className="btn p-2 rounded-full bg-red text-white w-fit ml-auto"
           >
             <Icon icon="ic:round-close" className="w-5 h-5" />
           </button>

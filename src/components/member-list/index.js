@@ -1,8 +1,9 @@
-import axios from "axios";
-import React, { useEffect, useState } from "react";
-import Modal from "../Modal";
 import { Icon } from "@iconify/react";
+import axios from "axios";
+import React, { useEffect, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
+import Modal from "../Modal";
+import Filters from "./Filters";
 
 const getData = async (setMembers, searchParams) => {
   try {
@@ -30,15 +31,33 @@ const Input = "p-2 border rounded border-dark";
 const MemberList = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [members, setMembers] = useState([]);
-  const [activities, setActivities] = useState([]);
   const [modal, setModal] = useState(false);
   const [isNew, setIsNew] = useState(true);
   const [memberData, setMemberData] = useState(initialMemberData);
+  const lastExecutedRef = useRef(0); // Track last execution time
 
   useEffect(() => {
-    getData(setMembers, searchParams);
-    getActivities();
+    const now = Date.now();
+    const timeSinceLastExecution = now - lastExecutedRef.current;
+    const interval = 100;
+
+    if (timeSinceLastExecution >= interval) {
+      getData(setMembers, searchParams);
+      lastExecutedRef.current = now;
+    } else {
+      // Otherwise, schedule to run after the remaining time
+      const timeoutId = setTimeout(() => {
+        getData(setMembers, searchParams);
+        lastExecutedRef.current = Date.now();
+      }, interval - timeSinceLastExecution);
+
+      return () => clearTimeout(timeoutId);
+    }
   }, [searchParams]);
+
+  // useEffect(() => {
+  //   getData(setMembers, searchParams);
+  // }, [searchParams]);
 
   const deleteMember = async (memberId) => {
     try {
@@ -99,129 +118,50 @@ const MemberList = () => {
     setMemberData(initialMemberData);
   };
 
-  const getActivities = async () => {
-    try {
-      const res = await axios.get("http://localhost:4444/activities");
-      setActivities(res.data);
-    } catch (err) {
-      console.log("ERROR", err);
-    }
-  };
-
   const tableHeaders = [
     { name: "name", label: "Name" },
     { name: "age", label: "Age" },
-    { name: "rating", label: "Member Rating" },
+    { name: "rating", label: "Rating" },
     { name: "activities", label: "Activities" },
   ];
 
   return (
-    <div className="grid grid-cols-[1fr_6fr] grid-rows-[min-content_1fr] p-10 gap-4 w-full h-screen overflow-hidden items-start">
-      <div className="flex col-span-full justify-between flex-wrap mb-2">
+    <div
+      className="relative grid md:grid-cols-[1fr_6fr] md:grid-rows-[min-content_1fr] p-4 md:p-10 gap-4 w-full content-start h-screen"
+      un-cloak
+    >
+      <div className="flex col-span-full flex-wrap mb-2 items-center gap-3">
         <h1 className="text-4xl font-bold text-center">My Club's Members</h1>
-        <div className="flex gap-4 justify-end">
-          <input
-            type="search"
-            className="p-3 border-2 rounded min-w-xl rounded-lg border-blue"
-            placeholder="Search for a member"
-            value={searchParams.get("query") || ""}
-            onChange={(e) => {
-              searchParams.set("query", e.target.value);
-              setSearchParams(searchParams);
-            }}
-          />
-        </div>
-      </div>
-
-      <div className="grid gap-4 items-start">
         <button
-          className="flex items-center gap-1 font-bold bg-blue px-4 py-3 rounded-lg text-white w-fit"
+          className="btn flex items-center gap-1 font-bold bg-blue p-2 rounded-full text-white w-fit"
           onClick={createMember}
         >
-          <Icon icon="tabler:plus" className="w-6 h-6"></Icon> Create Member
+          <Icon icon="humbleicons:user-add" className="w-6 h-6"></Icon>
         </button>
-        <h2 className="text-2xl flex gap-4 justify-between font-bold -mb-4">
-          Filters
-          <button
-            className="flex items-center gap-1 bg-blue text-white rounded-full text-sm px-2 py-1 aria-hidden:hidden"
-            aria-hidden={
-              !searchParams.get("activities") && !searchParams.get("rating")
-            }
-            onClick={() => {
-              searchParams.delete("activities");
-              searchParams.delete("rating");
-              setSearchParams(searchParams);
-            }}
-          >
-            <Icon icon="ic:round-close"></Icon>
-            clear
-          </button>
-        </h2>
-        <h3 className="text-xl font-bold mt-2">Activity</h3>
-        <div className="pl-2 -mt-3">
-          {activities.map((activity) => (
-            <label
-              key={activity}
-              className="flex items-center gap-2 w-fit cursor-pointer"
-            >
-              <input
-                type="checkbox"
-                name="activity[]"
-                value={activity}
-                checked={searchParams.getAll("activities")?.includes(activity)}
-                onChange={(e) => {
-                  if (e.target.checked) {
-                    searchParams.append("activities", activity);
-                  } else {
-                    searchParams.delete("activities", activity);
-                  }
-                  setSearchParams(searchParams);
-                }}
-              />
-              {activity}
-            </label>
-          ))}
-        </div>
-        <h3 className="text-xl font-bold">Rating</h3>
-        <div className="pl-2 -mt-3">
-          {Array(5)
-            .fill(0)
-            .map((_, i) => (
-              <label
-                key={i}
-                className="flex items-center gap-2 w-fit cursor-pointer"
-              >
-                <input
-                  type="checkbox"
-                  name="rating"
-                  value={i + 1}
-                  checked={searchParams
-                    .getAll("rating")
-                    ?.includes(String(i + 1))}
-                  onChange={(e) => {
-                    if (e.target.checked) {
-                      searchParams.append("rating", i + 1);
-                    } else {
-                      searchParams.delete("rating", i + 1);
-                    }
-                    setSearchParams(searchParams);
-                  }}
-                />
-                {Array(i + 1)
-                  .fill(0)
-                  .map((_, j) => (
-                    <Icon icon="mdi:star" className="text-yellow w-5 h-5" />
-                  ))}
-              </label>
-            ))
-            .reverse()}
-        </div>
+
+        <input
+          type="search"
+          className="p-3 border-2 rounded max-w-lg w-full rounded-lg border-blue ml-auto"
+          placeholder="Search for a member"
+          value={searchParams.get("query") || ""}
+          onChange={(e) => {
+            searchParams.set("query", e.target.value);
+            setSearchParams(searchParams);
+          }}
+        />
       </div>
 
+      <Filters
+        searchParams={searchParams}
+        setSearchParams={setSearchParams}
+        members={members}
+      />
+
       <div className="rounded-xl overflow-auto h-full">
-        <div className="grid grid-cols-[1fr_1fr_1fr_3fr_1fr] sticky top-0">
+        <div className="grid grid-cols-[1fr_1fr_1fr_3fr_1fr] sticky top-0 min-w-xl">
           {tableHeaders.map((header) => (
             <button
+              key={header.name}
               onClick={() => {
                 if (searchParams.get("sort") === header.name) {
                   searchParams.set("sort", `-${header.name}`);
@@ -251,7 +191,7 @@ const MemberList = () => {
         </div>
         {members.map((member) => (
           <div
-            className="grid grid-cols-[1fr_1fr_1fr_3fr_1fr] border-2 border-t-0 border-dark last:rounded-b-xl items-center"
+            className="grid grid-cols-[1fr_1fr_1fr_3fr_1fr] border-2 border-t-0 border-dark last:rounded-b-xl items-center min-w-xl"
             key={member.id}
           >
             <div className={Cell}>{member.name}</div>
@@ -263,13 +203,13 @@ const MemberList = () => {
             <div className={`flex gap-2 items-center ${Cell}`}>
               <button
                 onClick={() => editMember(member)}
-                className="p-2 rounded-full bg-blue text-white"
+                className="btn p-2 rounded-full bg-blue text-white"
               >
                 <Icon icon="tabler:edit" className="w-6 h-6"></Icon>
               </button>
               <button
                 onClick={() => deleteMember(member.id)}
-                className="p-2 rounded-full bg-red text-white"
+                className="btn p-2 rounded-full bg-red text-white"
               >
                 <Icon icon="tabler:trash" className="w-6 h-6"></Icon>
               </button>
@@ -339,7 +279,10 @@ const MemberList = () => {
             max={5}
             className={Input}
           />
-          <button type="submit" className="btn">
+          <button
+            type="submit"
+            className="btn bg-blue! text-white py-3 rounded-lg"
+          >
             {isNew ? "Create" : "Update"}
           </button>
         </form>
