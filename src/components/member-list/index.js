@@ -24,9 +24,9 @@ const initialMemberData = {
   rating: "",
 };
 
-const TH = "bg-dark p-2 font-bold text-white";
+const TH = "bg-slate-6 p-2 font-bold text-white";
 const Cell = "p-2";
-const Input = "p-2 border rounded border-dark";
+const Input = "p-2 border rounded border-slate-6 bg-transparent";
 
 const MemberList = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -141,7 +141,7 @@ const MemberList = () => {
 
         <input
           type="search"
-          className="p-3 border-2 rounded max-w-lg w-full rounded-lg border-blue ml-auto"
+          className="p-3 border-2 rounded max-w-lg w-full rounded-lg ml-auto border-slate-6 outline-none focus-visible:ring-3"
           placeholder="Search for a member"
           value={searchParams.get("query") || ""}
           onChange={(e) => {
@@ -191,7 +191,7 @@ const MemberList = () => {
         </div>
         {members.map((member) => (
           <div
-            className="grid grid-cols-[1fr_1fr_1fr_3fr_1fr] border-2 border-t-0 border-dark last:rounded-b-xl items-center min-w-xl"
+            className="grid grid-cols-[1fr_1fr_1fr_3fr_1fr] border-2 border-t-0 border-slate-6 last:rounded-b-xl items-center min-w-xl"
             key={member.id}
           >
             <div className={Cell}>{member.name}</div>
@@ -287,6 +287,16 @@ const MemberList = () => {
           </button>
         </form>
       </Modal>
+      <button
+        className="btn absolute top-4 right-4"
+        onClick={() => {
+          const currentColorScheme = document.documentElement.style.colorScheme;
+          document.documentElement.style.colorScheme =
+            currentColorScheme === "dark" ? "light" : "dark";
+        }}
+      >
+        <Icon icon="line-md:light-dark-loop" className="w-6 h-6 text-blue" />
+      </button>
     </div>
   );
 };
