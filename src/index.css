@@ -1,3 +1,7 @@
+:root {
+  --color-base: light-dark(#fff, #121212);
+}
+
 body {
   margin: 0;
   font-size: 1rem;

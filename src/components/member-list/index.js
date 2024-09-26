@@ -4,6 +4,8 @@ import React, { useEffect, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import Modal from "../Modal";
 import Filters from "./Filters";
+import Combobox from "../Combobox";
+import Input from "../Input";
 
 const getData = async (setMembers, searchParams) => {
   try {
@@ -26,7 +28,6 @@ const initialMemberData = {
 
 const TH = "bg-slate-6 p-2 font-bold text-white";
 const Cell = "p-2";
-const Input = "p-2 border rounded border-slate-6 bg-transparent";
 
 const MemberList = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -125,9 +126,24 @@ const MemberList = () => {
     { name: "activities", label: "Activities" },
   ];
 
+  const [activities, setActivities] = useState([]);
+
+  useEffect(() => {
+    const getActivities = async () => {
+      try {
+        const res = await axios.get("http://localhost:4444/activities");
+        setActivities(res.data);
+      } catch (err) {
+        console.log("ERROR", err);
+      }
+    };
+
+    getActivities();
+  }, [members]);
+
   return (
     <div
-      className="relative grid md:grid-cols-[1fr_6fr] md:grid-rows-[min-content_1fr] p-4 md:p-10 gap-4 w-full content-start h-screen"
+      className="relative grid md:grid-cols-[1fr_6fr] md:grid-rows-[min-content_1fr] p-4 md:p-10 gap-4 w-full content-start h-screen max-w-6xl mx-auto"
       un-cloak
     >
       <div className="flex col-span-full flex-wrap mb-2 items-center gap-3">
@@ -154,7 +170,8 @@ const MemberList = () => {
       <Filters
         searchParams={searchParams}
         setSearchParams={setSearchParams}
-        members={members}
+        activities={activities}
+        setActivities={setActivities}
       />
 
       <div className="rounded-xl overflow-auto h-full">
@@ -228,19 +245,19 @@ const MemberList = () => {
         }
       >
         <form className="grid p-4 gap-4" onSubmit={handleSubmit} method="post">
-          <input
-            required
+          <Input
+            label="Name"
+            placeholder="name"
+            type="text"
             value={memberData.name}
             onChange={(e) =>
               setMemberData({ ...memberData, name: e.target.value })
             }
-            type="text"
-            name="name"
-            placeholder="Name"
-            className={Input}
-          />
-          <input
             required
+          />
+
+          <Input
+            label="Age"
             value={memberData.age}
             onChange={(e) =>
               setMemberData({ ...memberData, age: e.target.value })
@@ -248,25 +265,19 @@ const MemberList = () => {
             type="number"
             name="age"
             placeholder="Age"
+            required
             min={0}
             max={120}
-            className={Input}
           />
-          <input
-            required
-            value={memberData.activities}
-            onChange={(e) =>
-              setMemberData({
-                ...memberData,
-                activities: e.target.value.split(",").map((a) => a.trim()),
-              })
-            }
-            type="text"
-            name="activities"
-            placeholder="Activities"
-            className={Input}
+          <Combobox
+            label="Activities"
+            activeOptions={memberData.activities}
+            options={activities}
+            placeholder="Add another activity"
+            setMemberData={setMemberData}
           />
-          <input
+          <Input
+            label="Rating"
             required
             value={memberData.rating}
             onChange={(e) =>
@@ -277,7 +288,6 @@ const MemberList = () => {
             placeholder="Rating"
             min={1}
             max={5}
-            className={Input}
           />
           <button
             type="submit"

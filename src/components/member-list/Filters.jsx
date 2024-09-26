@@ -1,23 +1,7 @@
 import { Icon } from "@iconify/react";
-import axios from "axios";
-import React, { useEffect, useState } from "react";
+import React from "react";
 
-const Filters = ({ searchParams, setSearchParams, members }) => {
-  const [activities, setActivities] = useState([]);
-
-  useEffect(() => {
-    const getActivities = async () => {
-      try {
-        const res = await axios.get("http://localhost:4444/activities");
-        setActivities(res.data);
-      } catch (err) {
-        console.log("ERROR", err);
-      }
-    };
-
-    getActivities();
-  }, [members]);
-
+const Filters = ({ searchParams, setSearchParams, activities }) => {
   return (
     <div className="flex flex-wrap gap-4 items-start justify-start content-start">
       <button

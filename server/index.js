@@ -83,8 +83,15 @@ app.get("/members", (req, res) => {
     });
   }
 
+  const result = filteredMembers.map((member) => {
+    return {
+      ...member,
+      activities: [...new Set(member.activities)],
+    };
+  });
+
   console.log("GET filtered /members");
-  res.send(filteredMembers);
+  res.send(result);
 });
 
 /**
