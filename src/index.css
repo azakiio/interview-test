@@ -8,6 +8,14 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+dialog::backdrop {
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+[un-cloak] {
+  display: none;
+}
+
 table tbody {
   display: block;
   max-height: 50rem;
@@ -22,8 +30,15 @@ table tbody tr {
 }
 
 .btn {
-  padding: 0.5rem 1rem;
-  border-radius: 1rem;
-  background-color: #4dabf7;
-  color: white;
+  outline: none;
+  transition: translate 0.3s;
+
+  &:hover {
+    translate: 0 -4px;
+  }
+
+  &:focus-visible {
+    translate: 0 -4px;
+    box-shadow: 0 0 0 3px var(--un-ring-color);
+  }
 }
