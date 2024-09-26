@@ -90,7 +90,7 @@ export default function Combobox({
             {options
               .filter(
                 (option) =>
-                  option.toLowerCase().includes(inputValue) &&
+                  option.toLowerCase().includes(inputValue.toLowerCase()) &&
                   !activeOptions.includes(option)
               )
               .map((option) => (
